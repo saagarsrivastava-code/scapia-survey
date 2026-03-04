@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scapia Travel Survey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #CE3E00;
+      --primary-dark: #B33500;
+      --primary-border: #E34700;
+      --bg: #FFFFFF;
+      --surface: #F1F6FB;
+      --surface-2: #F8FAFD;
+      --border: #E1EAF4;
+      --text: #262B30;
+      --muted: #8C9AAA;
+      --disabled: #CFDBE9;
+      --green: #22C55E;
+    }
+
+    body {
+      font-family: 'Lexend Deca', sans-serif;
+      background: #F1F6FB;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 16px 16px 80px;
+    }
+
+    /* ── Shell ──────────────────────────────────────────────────── */
+    .shell {
+      width: 100%; max-width: 400px;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    /* ── Header ─────────────────────────────────────────────────── */
+    .top-bar {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 16px 16px 0;
+      gap: 10px;
+    }
+    .drag-pill {
+      width: 73px; height: 4px;
+      background: var(--disabled); border-radius: 8px;
+    }
+    .logo-img {
+      height: 23px; width: auto;
+    }
+    .top-title {
+      font-size: 16px; font-weight: 600; line-height: 22px;
+      color: var(--text); text-align: center;
+    }
+    .top-divider {
+      width: 100%; height: 4px; background: var(--surface);
+      margin-top: 10px;
+    }
+
+    /* ── Progress ────────────────────────────────────────────────── */
+    .progress-wrap {
+      padding: 14px 20px 0;
+    }
+    .progress-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 6px;
+    }
+    .progress-label { font-size: 12px; color: var(--muted); font-weight: 400; }
+    .progress-bar-bg {
+      height: 3px; background: var(--border); border-radius: 2px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ── Question area ───────────────────────────────────────────── */
+    .q-area {
+      padding: 24px 20px;
+      min-height: 420px;
+    }
+
+    .q-container { display: none; }
+    .q-container.active { display: block; animation: slideUp 0.3s ease both; }
+    .q-container.exit   { animation: slideDn 0.2s ease both; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideDn {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-14px); }
+    }
+
+    .q-label {
+      font-size: 14px; font-weight: 400; color: var(--muted);
+      margin-bottom: 13px; line-height: 20px;
+    }
+    .q-title {
+      font-size: 16px; font-weight: 600; line-height: 22px;
+      color: var(--text); margin-bottom: 20px;
+    }
+
+    /* ── Text input ──────────────────────────────────────────────── */
+    .field {
+      width: 100%; padding: 14px 16px;
+      background: var(--surface); border: none; border-radius: 8px;
+      color: var(--text); font-size: 14px; font-family: 'Lexend Deca', sans-serif;
+      outline: none; transition: box-shadow 0.2s;
+      line-height: 20px;
+    }
+    .field::placeholder { color: var(--muted); }
+    .field:focus { box-shadow: 0 0 0 2px rgba(206,62,0,0.2); }
+
+    /* ── Yes/No ──────────────────────────────────────────────────── */
+    .yn-row { display: flex; gap: 10px; }
+    .yn-btn {
+      flex: 1; padding: 14px 16px; border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text); font-size: 14px; font-weight: 500;
+      font-family: 'Lexend Deca', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+      line-height: 20px;
+    }
+    .yn-btn:hover { border-color: var(--primary); }
+    .yn-btn.selected {
+      border-color: var(--primary);
+      background: rgba(206,62,0,0.06);
+      color: var(--primary); font-weight: 600;
+    }
+
+    /* ── Option list ─────────────────────────────────────────────── */
+    .option-list { display: flex; flex-direction: column; gap: 8px; }
+    .option-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; border-radius: 8px;
+      background: var(--surface); border: 1.5px solid transparent;
+      cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .option-item:hover { border-color: var(--primary); }
+    .option-item.selected {
+      border-color: var(--primary);
+      background: rgba(206,62,0,0.06);
+    }
+    .option-icon { font-size: 18px; flex-shrink: 0; }
+    .option-text { font-size: 14px; font-weight: 400; color: var(--text); flex: 1; line-height: 20px; }
+    .option-radio {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--disabled);
+      margin-left: auto; flex-shrink: 0; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .option-item.selected .option-radio {
+      border-color: var(--primary); background: var(--primary);
+    }
+    .option-item.selected .option-radio::after {
+      content: ''; width: 6px; height: 6px;
+      background: #fff; border-radius: 50%;
+    }
+
+    /* ── Pills ───────────────────────────────────────────────────── */
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill {
+      padding: 9px 16px; border-radius: 100px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text); font-size: 14px; font-weight: 400;
+      font-family: 'Lexend Deca', sans-serif;
+      cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .pill:hover { border-color: var(--primary); }
+    .pill.selected {
+      border-color: var(--primary);
+      background: rgba(206,62,0,0.06);
+      color: var(--primary); font-weight: 600;
+    }
+
+    /* ── Chips ───────────────────────────────────────────────────── */
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 9px 14px; border-radius: 100px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text); font-size: 14px; font-weight: 400;
+      font-family: 'Lexend Deca', sans-serif;
+      cursor: pointer; transition: all 0.2s; user-select: none;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .chip:hover { border-color: var(--primary); }
+    .chip.selected {
+      border-color: var(--primary);
+      background: rgba(206,62,0,0.06);
+      color: var(--primary);
+    }
+
+    /* ── Textarea ────────────────────────────────────────────────── */
+    .textarea {
+      width: 100%; padding: 14px 16px; margin-top: 10px;
+      background: var(--surface); border: none; border-radius: 8px;
+      color: var(--text); font-size: 14px; font-family: 'Lexend Deca', sans-serif;
+      resize: vertical; min-height: 72px; outline: none;
+      transition: box-shadow 0.2s; line-height: 20px;
+    }
+    .textarea::placeholder { color: var(--muted); }
+    .textarea:focus { box-shadow: 0 0 0 2px rgba(206,62,0,0.2); }
+
+    /* ── Conditional reveal ──────────────────────────────────────── */
+    .reveal {
+      overflow: hidden; max-height: 0;
+      transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.3s;
+      opacity: 0; margin-top: 0;
+    }
+    .reveal.open { max-height: 120px; opacity: 1; margin-top: 10px; }
+
+    /* ── CTA ─────────────────────────────────────────────────────── */
+    .cta-wrap {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .cta-btn {
+      width: 100%; padding: 10px 16px; height: 42px;
+      border-radius: 8px;
+      background: var(--primary);
+      border: 1px solid var(--primary-border);
+      color: #fff; font-size: 16px; font-weight: 400;
+      font-family: 'Lexend Deca', sans-serif;
+      cursor: pointer; transition: background 0.2s, opacity 0.2s;
+    }
+    .cta-btn:hover { background: var(--primary-dark); }
+    .cta-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Info strip ──────────────────────────────────────────────── */
+    .info-strip {
+      margin: 0 20px 12px;
+      background: var(--surface-2); border: 0.5px solid var(--border);
+      border-radius: 4px; padding: 4px 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .info-strip span { font-size: 12px; color: #4B545E; line-height: 16px; }
+
+    /* ── Thank you ───────────────────────────────────────────────── */
+    #thank-you { display: none; text-align: center; padding: 40px 20px; }
+    #thank-you .ty-emoji { font-size: 56px; display: block; margin-bottom: 16px; }
+    #thank-you h2 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    #thank-you p { font-size: 14px; color: var(--muted); line-height: 22px; }
+    #thank-you strong { color: var(--primary); }
+
+    /* ── Error ───────────────────────────────────────────────────── */
+    .err { font-size: 12px; color: #E34700; margin-top: 6px; display: none; }
+    .err.show { display: block; }
+
+    /* ── Confetti ────────────────────────────────────────────────── */
+    #confetti-canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; pointer-events: none; z-index: 999;
+    }
+
+    @media (max-width: 440px) {
+      body { padding: 0; background: #fff; }
+      .shell { border-radius: 0; box-shadow: none; min-height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="shell">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <img class="logo-img"
+      src="https://www.figma.com/api/mcp/asset/c41f2919-727a-407c-91d3-22244230030c"
+      alt="Scapia" />
+    <div class="top-title">Travel Survey</div>
+  </div>
+  <div class="top-divider"></div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span class="progress-label" id="progress-label">Question 1 of 7</span>
+      <span class="progress-label" id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill" style="width:5%"></div>
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div class="q-area">
+
+    <!-- Q0 — Name -->
+    <div class="q-container active" id="q0">
+      <div class="q-label">Let's start with the basics</div>
+      <div class="q-title">What's your name? 👋</div>
+      <input class="field" id="q0-input" type="text" placeholder="e.g. Priya, Arjun…" oninput="toggleCTA('q0')" />
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-container" id="q1">
+      <div class="q-label">Question 1 of 7</div>
+      <div class="q-title">Have you travelled for a holiday or vacation in the past year? 🌍</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="selectYN('q1','yes')">✅ Yes, I have!</button>
+        <button class="yn-btn no"  onclick="selectYN('q1','no')">🙅 Not yet</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-container" id="q2">
+      <div class="q-label">Question 2 of 7</div>
+      <div class="q-title">Where did you travel? 🗺️</div>
+      <input class="field" id="q2-input" type="text" placeholder="e.g. Bali, Paris, Goa, Maldives…" oninput="toggleCTA('q2')" />
+      <div class="err" id="q2-err">Please tell us where you went.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-container" id="q3">
+      <div class="q-label">Question 3 of 7</div>
+      <div class="q-title">How did you plan your trip? 🧳</div>
+      <div class="option-list">
+        <div class="option-item" onclick="selectOption('q3','package',this)">
+          <span class="option-icon">📦</span>
+          <span class="option-text">Booked a holiday package</span>
+          <span class="option-radio"></span>
+        </div>
+        <div class="option-item" onclick="selectOption('q3','self',this)">
+          <span class="option-icon">🧠</span>
+          <span class="option-text">Planned it myself</span>
+          <span class="option-radio"></span>
+        </div>
+        <div class="option-item" onclick="selectOption('q3','mix',this)">
+          <span class="option-icon">🔀</span>
+          <span class="option-text">A mix of both</span>
+          <span class="option-radio"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4a -->
+    <div class="q-container" id="q4a">
+      <div class="q-label">Question 4 of 7</div>
+      <div class="q-title">Where did you book your holiday package from? 🏷️</div>
+      <input class="field" id="q4a-input" type="text"
+        placeholder="e.g. MakeMyTrip, Thomas Cook, EaseMyTrip…"
+        oninput="toggleCTA('q4a')" />
+      <div class="err" id="q4a-err">Please share where you booked.</div>
+    </div>
+
+    <!-- Q4b — age -->
+    <div class="q-container" id="q4b">
+      <div class="q-label" id="q4b-label">Question 4 of 7</div>
+      <div class="q-title">What is your age group? 🎂</div>
+      <div class="pill-row">
+        <div class="pill" onclick="selectPill('q4b',this)">20–25</div>
+        <div class="pill" onclick="selectPill('q4b',this)">25–30</div>
+        <div class="pill" onclick="selectPill('q4b',this)">30–35</div>
+        <div class="pill" onclick="selectPill('q4b',this)">35–40</div>
+        <div class="pill" onclick="selectPill('q4b',this)">40–45</div>
+        <div class="pill" onclick="selectPill('q4b',this)">45–50</div>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-container" id="q5">
+      <div class="q-label">Question 5 of 7</div>
+      <div class="q-title">What was the purpose of your travel? 🎯</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Select all that apply</p>
+      <div class="chip-row" id="purpose-chips">
+        <div class="chip" onclick="toggleChip(this)">💑 Honeymoon</div>
+        <div class="chip" onclick="toggleChip(this)">🏖️ Vacation</div>
+        <div class="chip" onclick="toggleChip(this)">🏡 Staycation</div>
+        <div class="chip" onclick="toggleChip(this)">👫 Trip with Friends</div>
+        <div class="chip" onclick="toggleChip(this)">👨‍👩‍👧 Family Trip</div>
+      </div>
+      <textarea class="textarea" id="q5-other" placeholder="Other purpose? Tell us more… (optional)"></textarea>
+      <div class="err" id="q5-err">Please select at least one option.</div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="q-container" id="q6">
+      <div class="q-label" id="q6-label">Question 6 of 7</div>
+      <div class="q-title">Have you ever booked a holiday package before? 📋</div>
+      <div class="yn-row">
+        <button class="yn-btn yes" onclick="selectYN('q6','yes')">✅ Yes</button>
+        <button class="yn-btn no"  onclick="selectYN('q6','no')">❌ No</button>
+      </div>
+      <div class="reveal" id="q6-reveal">
+        <input class="field" id="q6-where" type="text"
+          placeholder="Where did you book it from?"
+          oninput="validateQ6Reveal()" />
+      </div>
+    </div>
+
+    <!-- Thank you -->
+    <div id="thank-you">
+      <span class="ty-emoji">🎉</span>
+      <h2>Thanks for sharing!</h2>
+      <p>Your responses help us make travel better for everyone.<br/>Keep exploring the world with <strong>Scapia</strong> ✈️</p>
+    </div>
+
+  </div><!-- /q-area -->
+
+  <!-- Info strip (visible before submit on q6) -->
+  <div class="info-strip" id="info-strip" style="display:none;">
+    <span>ℹ️</span>
+    <span>Your responses are anonymous and secure.</span>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap" id="cta-wrap">
+    <button class="cta-btn" id="main-cta" disabled onclick="handleCTA()">Continue</button>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+  const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbz8AunT197qxkgil-VdWwvta5AkUWcX7cNG_XsRFlILgC7L5KypyEBJ_pMBRNO2VUTt1g/exec';
+
+  const answers = {
+    q0: '', q1: null, q2: '', q3: null, q4a: '', q4b: null, q5: [], q5other: '', q6: null, q6where: ''
+  };
+
+  let currentStep = 0;
+
+  function getFlow() {
+    const flow = ['q0', 'q1'];
+    if (answers.q1 === 'yes') {
+      flow.push('q2', 'q3');
+      if (answers.q3 === 'package' || answers.q3 === 'mix') flow.push('q4a');
+      flow.push('q4b', 'q5', 'q6');
+    } else {
+      flow.push('q6', 'q4b');
+    }
+    return flow;
+  }
+
+  function currentQId() { return getFlow()[currentStep]; }
+
+  function updateProgress() {
+    const flow = getFlow();
+    const total = flow.length;
+    const pct = Math.max(5, Math.round((currentStep / total) * 100));
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = 'Question ' + (currentStep + 1) + ' of ' + total;
+    document.getElementById('progress-pct').textContent = pct + '%';
+  }
+
+  function handleCTA() {
+    const qid = currentQId();
+    if (qid === 'q6') { submitSurvey(); return; }
+    next(qid);
+  }
+
+  function next(currentId) {
+    const flow = getFlow();
+    const idx = flow.indexOf(currentId);
+    const nextId = flow[idx + 1];
+    const currentEl = document.getElementById(currentId);
+
+    currentEl.classList.add('exit');
+    setTimeout(function() {
+      currentEl.classList.remove('active', 'exit');
+      if (nextId) {
+        currentStep = idx + 1;
+        document.getElementById(nextId).classList.add('active');
+        updateProgress();
+        updateCTA();
+        // Update q6 label for no-travel flow
+        if (nextId === 'q6' && answers.q1 === 'no') {
+          document.getElementById('q6-label').textContent = 'Question 2 of ' + getFlow().length;
+        }
+        if (nextId === 'q4b' && answers.q1 === 'no') {
+          document.getElementById('q4b-label').textContent = 'Question 3 of ' + getFlow().length;
+        }
+        // Show info strip on last question
+        document.getElementById('info-strip').style.display = nextId === 'q6' ? 'flex' : 'none';
+        // Change CTA label on last question
+        document.getElementById('main-cta').textContent = nextId === 'q6' ? 'Submit' : 'Continue';
+      }
+    }, 220);
+  }
+
+  function updateCTA() {
+    const qid = currentQId();
+    let enabled = false;
+    if (qid === 'q0') enabled = answers.q0.trim().length > 0;
+    else if (qid === 'q1') enabled = answers.q1 !== null;
+    else if (qid === 'q2') enabled = answers.q2.trim().length > 0;
+    else if (qid === 'q3') enabled = answers.q3 !== null;
+    else if (qid === 'q4a') enabled = answers.q4a.trim().length > 0;
+    else if (qid === 'q4b') enabled = answers.q4b !== null;
+    else if (qid === 'q5') enabled = answers.q5.length > 0;
+    else if (qid === 'q6') enabled = answers.q6 !== null && (answers.q6 === 'no' || answers.q6where.trim().length > 0);
+    document.getElementById('main-cta').disabled = !enabled;
+  }
+
+  function selectYN(qid, val) {
+    answers[qid] = val;
+    const container = document.getElementById(qid);
+    container.querySelectorAll('.yn-btn').forEach(function(b) { b.classList.remove('selected'); });
+    container.querySelector('.yn-btn.' + val).classList.add('selected');
+    if (qid === 'q6') {
+      const reveal = document.getElementById('q6-reveal');
+      if (val === 'yes') { reveal.classList.add('open'); answers.q6where = ''; }
+      else { reveal.classList.remove('open'); answers.q6where = ''; }
+    }
+    // Auto-advance for q1
+    if (qid === 'q1') { setTimeout(function() { next('q1'); }, 300); return; }
+    updateCTA();
+  }
+
+  function selectOption(qid, val, el) {
+    answers[qid] = val;
+    el.closest('.option-list').querySelectorAll('.option-item').forEach(function(c) { c.classList.remove('selected'); });
+    el.classList.add('selected');
+    setTimeout(function() { next(qid); }, 300);
+  }
+
+  function selectPill(qid, el) {
+    answers[qid] = el.textContent.trim();
+    el.closest('.pill-row').querySelectorAll('.pill').forEach(function(p) { p.classList.remove('selected'); });
+    el.classList.add('selected');
+    updateCTA();
+  }
+
+  function toggleChip(el) {
+    el.classList.toggle('selected');
+    answers.q5 = Array.from(document.querySelectorAll('#purpose-chips .chip.selected')).map(function(c) { return c.textContent.trim(); });
+    updateCTA();
+  }
+
+  function toggleCTA(qid) {
+    var val = document.getElementById(qid + '-input').value.trim();
+    answers[qid] = val;
+    updateCTA();
+  }
+
+  function validateQ6Reveal() {
+    answers.q6where = document.getElementById('q6-where').value.trim();
+    updateCTA();
+  }
+
+  async function submitSurvey() {
+    answers.q5other = document.getElementById('q5-other').value.trim();
+    answers.q6where = document.getElementById('q6-where').value.trim();
+
+    const payload = {
+      timestamp: new Date().toISOString(),
+      name: answers.q0 || '',
+      travelled: answers.q1 === 'yes' ? 'Yes' : 'No',
+      destination: answers.q2 || '',
+      planningMethod: answers.q3 || '',
+      packageSource: answers.q4a || '',
+      ageGroup: answers.q4b || '',
+      purpose: answers.q5.join(', ') + (answers.q5other ? ' | Other: ' + answers.q5other : ''),
+      bookedBefore: answers.q6 === 'yes' ? 'Yes' : 'No',
+      bookedBeforeWhere: answers.q6where || ''
+    };
+
+    // Hide question, show thank you
+    document.getElementById('q6').classList.remove('active');
+    document.getElementById('thank-you').style.display = 'block';
+    document.getElementById('cta-wrap').style.display = 'none';
+    document.getElementById('info-strip').style.display = 'none';
+    document.querySelector('.progress-wrap').style.display = 'none';
+    launchConfetti();
+
+    if (WEBHOOK_URL && WEBHOOK_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL_HERE') {
+      try {
+        const params = new URLSearchParams(payload).toString();
+        new Image().src = WEBHOOK_URL + '?' + params;
+      } catch (e) {
+        console.warn('Webhook error:', e);
+      }
+    }
+  }
+
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const colors = ['#CE3E00','#F97316','#E34700','#FCD34D','#34D399','#F472B6'];
+    const pieces = Array.from({length: 100}, function() {
+      return {
+        x: Math.random() * canvas.width, y: -10 - Math.random() * 150,
+        r: 4 + Math.random() * 5, d: 2 + Math.random() * 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tiltAngle: 0, tiltSpeed: 0.05 + Math.random() * 0.05
+      };
+    });
+    var frame = 0;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(function(p) {
+        p.tiltAngle += p.tiltSpeed; p.y += p.d;
+        ctx.beginPath(); ctx.lineWidth = p.r; ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + Math.sin(p.tiltAngle) * 10, p.y);
+        ctx.lineTo(p.x + Math.sin(p.tiltAngle) * 10, p.y + p.r * 2);
+        ctx.stroke();
+      });
+      frame++;
+      if (frame < 160) requestAnimationFrame(draw);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    draw();
+  }
+
+  updateProgress();
+  updateCTA();
+</script>
+</body>
+</html>
