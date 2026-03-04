@@ -583,7 +583,7 @@
     if (WEBHOOK_URL && WEBHOOK_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_WEBHOOK_URL_HERE') {
       try {
         const params = new URLSearchParams(payload).toString();
-        new Image().src = WEBHOOK_URL + '?' + params;
+        await fetch(WEBHOOK_URL + '?' + params, { mode: 'no-cors' });
       } catch (e) {
         console.warn('Webhook error:', e);
       }
