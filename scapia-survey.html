@@ -311,7 +311,6 @@
 
     <!-- Q1 -->
     <div class="q-container" id="q1">
-      <div class="q-label">Question 1 of 7</div>
       <div class="q-title">Have you travelled on a trip in the past year? (not work related) 🌍</div>
       <div class="yn-row">
         <button class="yn-btn yes" onclick="selectYN('q1','yes')">✅ Yes, I have!</button>
@@ -321,7 +320,6 @@
 
     <!-- Q2 -->
     <div class="q-container" id="q2">
-      <div class="q-label">Question 2 of 7</div>
       <div class="q-title">Where did you travel? 🗺️</div>
       <input class="field" id="q2-input" type="text" placeholder="e.g. Bali, Paris, Goa, Maldives…" oninput="toggleCTA('q2')" />
       <div class="err" id="q2-err">Please tell us where you went.</div>
@@ -329,7 +327,6 @@
 
     <!-- Q3 -->
     <div class="q-container" id="q3">
-      <div class="q-label">Question 3 of 7</div>
       <div class="q-title">How did you plan your trip? 🧳</div>
       <div class="option-list">
         <div class="option-item" onclick="selectOption('q3','package',this)">
@@ -352,7 +349,6 @@
 
     <!-- Q4a -->
     <div class="q-container" id="q4a">
-      <div class="q-label">Question 4 of 7</div>
       <div class="q-title">Where did you book your holiday package from? 🏷️</div>
       <input class="field" id="q4a-input" type="text"
         placeholder="e.g. MakeMyTrip, Thomas Cook, EaseMyTrip…"
@@ -362,7 +358,6 @@
 
     <!-- Q4b — age -->
     <div class="q-container" id="q4b">
-      <div class="q-label" id="q4b-label">Question 4 of 7</div>
       <div class="q-title">What is your age group? 🎂</div>
       <div class="pill-row">
         <div class="pill" onclick="selectPill('q4b',this)">20–25</div>
@@ -376,7 +371,6 @@
 
     <!-- Q5 -->
     <div class="q-container" id="q5">
-      <div class="q-label">Question 5 of 7</div>
       <div class="q-title">What was the purpose of your travel? 🎯</div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Select all that apply</p>
       <div class="chip-row" id="purpose-chips">
@@ -392,7 +386,6 @@
 
     <!-- Q6 -->
     <div class="q-container" id="q6">
-      <div class="q-label" id="q6-label">Question 6 of 7</div>
       <div class="q-title">Have you ever booked a holiday package before? 📋</div>
       <div class="yn-row">
         <button class="yn-btn yes" onclick="selectYN('q6','yes')">✅ Yes</button>
@@ -413,12 +406,6 @@
     </div>
 
   </div><!-- /q-area -->
-
-  <!-- Info strip (visible before submit on q6) -->
-  <div class="info-strip" id="info-strip" style="display:none;">
-    <span>ℹ️</span>
-    <span>Your responses are anonymous and secure.</span>
-  </div>
 
   <!-- CTA -->
   <div class="cta-wrap" id="cta-wrap">
@@ -486,8 +473,6 @@
         if (nextId === 'q4b' && answers.q1 === 'no') {
           document.getElementById('q4b-label').textContent = 'Question 3 of ' + getFlow().length;
         }
-        // Show info strip on last question
-        document.getElementById('info-strip').style.display = nextId === 'q6' ? 'flex' : 'none';
         // Change CTA label on last question
         document.getElementById('main-cta').textContent = nextId === 'q6' ? 'Submit' : 'Continue';
       }
@@ -573,7 +558,6 @@
     document.getElementById('q6').classList.remove('active');
     document.getElementById('thank-you').style.display = 'block';
     document.getElementById('cta-wrap').style.display = 'none';
-    document.getElementById('info-strip').style.display = 'none';
     document.querySelector('.progress-wrap').style.display = 'none';
     launchConfetti();
 
