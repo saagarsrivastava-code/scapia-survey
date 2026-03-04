@@ -313,7 +313,7 @@
     <!-- Q1 -->
     <div class="q-container" id="q1">
       <div class="q-label">Question 1 of 7</div>
-      <div class="q-title">Have you travelled for a holiday or vacation in the past year? 🌍</div>
+      <div class="q-title">Have you travelled on a trip in the past year? (not work related) 🌍</div>
       <div class="yn-row">
         <button class="yn-btn yes" onclick="selectYN('q1','yes')">✅ Yes, I have!</button>
         <button class="yn-btn no"  onclick="selectYN('q1','no')">🙅 Not yet</button>
@@ -519,8 +519,6 @@
       if (val === 'yes') { reveal.classList.add('open'); answers.q6where = ''; }
       else { reveal.classList.remove('open'); answers.q6where = ''; }
     }
-    // Auto-advance for q1
-    if (qid === 'q1') { setTimeout(function() { next('q1'); }, 300); return; }
     updateCTA();
   }
 
@@ -528,7 +526,7 @@
     answers[qid] = val;
     el.closest('.option-list').querySelectorAll('.option-item').forEach(function(c) { c.classList.remove('selected'); });
     el.classList.add('selected');
-    setTimeout(function() { next(qid); }, 300);
+    updateCTA();
   }
 
   function selectPill(qid, el) {
